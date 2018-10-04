@@ -91,7 +91,12 @@ class FeatureCorrelation(torch.nn.Module):
         self.shape = shape
         self.ReLU = nn.ReLU()
 
-    def forward(self, feature_A, feature_B):
+    def forward(self, feature_A, feature_B, cues_A, cues_B):
+        if cues_A is None or cues_B is None:
+            # localization cues are available
+            pass # TODO: create uniform localization weight over all the images.
+
+        # TODO: update this to use localization cues.
         b, c, h, w = feature_A.size()
         if self.shape == '3D':
             # reshape features for matrix multiplication
@@ -207,8 +212,11 @@ class CNNGeometric(nn.Module):
         # feature extraction
         feature_A = self.FeatureExtraction(tnf_batch['source_image'])
         feature_B = self.FeatureExtraction(tnf_batch['target_image'])
+        # localization cues
+        cues_A = tnf_batch.get('source_cues')
+        cues_B = tnf_batch.get('target_cues')
         # feature correlation
-        correlation = self.FeatureCorrelation(feature_A, feature_B)
+        correlation = self.FeatureCorrelation(feature_A, feature_B, cues_A, cues_B)
         # regression to tnf parameters theta
         theta = self.FeatureRegression(correlation)
 
