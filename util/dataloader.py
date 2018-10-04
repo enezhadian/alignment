@@ -17,12 +17,10 @@ if PY2:
 else:
     string_classes = (str, bytes)
 
-
 if sys.version_info[0] == 2:
     import Queue as queue
 else:
     import queue
-
 
 _use_shared_memory = False
 """Whether to use shared memory in default_collate"""
@@ -120,8 +118,9 @@ def default_collate(batch):
         transposed = zip(*batch)
         return [default_collate(samples) for samples in transposed]
 
-    raise TypeError(("batch must contain tensors, numbers, dicts or lists; found {}"
-                     .format(type(batch[0]))))
+    raise TypeError(
+        ("batch must contain tensors, numbers, dicts or lists; found {}".format(type(batch[0])))
+    )
 
 
 def pin_memory_batch(batch):
@@ -162,8 +161,12 @@ class DataLoaderIter(object):
             self.workers = [
                 multiprocessing.Process(
                     target=_worker_loop,
-                    args=(self.dataset, self.index_queue, self.data_queue, self.collate_fn, np.random.randint(0, 4294967296, dtype='uint32')))
-                for _ in range(self.num_workers)]
+                    args=(
+                        self.dataset, self.index_queue, self.data_queue, self.collate_fn,
+                        np.random.randint(0, 4294967296, dtype='uint32')
+                    )
+                ) for _ in range(self.num_workers)
+            ]
 
             for w in self.workers:
                 w.daemon = True  # ensure that the worker exits on process exit
@@ -173,8 +176,8 @@ class DataLoaderIter(object):
                 in_data = self.data_queue
                 self.data_queue = queue.Queue()
                 self.pin_thread = threading.Thread(
-                    target=_pin_memory_loop,
-                    args=(in_data, self.data_queue, self.done_event))
+                    target=_pin_memory_loop, args=(in_data, self.data_queue, self.done_event)
+                )
                 self.pin_thread.daemon = True
                 self.pin_thread.start()
 
@@ -281,8 +284,18 @@ class DataLoader(object):
             will be smaller. (default: False)
     """
 
-    def __init__(self, dataset, batch_size=1, shuffle=False, sampler=None, batch_sampler=None,
-                 num_workers=0, collate_fn=default_collate, pin_memory=False, drop_last=False):
+    def __init__(
+        self,
+        dataset,
+        batch_size=1,
+        shuffle=False,
+        sampler=None,
+        batch_sampler=None,
+        num_workers=0,
+        collate_fn=default_collate,
+        pin_memory=False,
+        drop_last=False
+    ):
         self.dataset = dataset
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -292,8 +305,10 @@ class DataLoader(object):
 
         if batch_sampler is not None:
             if batch_size > 1 or shuffle or sampler is not None or drop_last:
-                raise ValueError('batch_sampler is mutually exclusive with '
-                                 'batch_size, shuffle, sampler, and drop_last')
+                raise ValueError(
+                    'batch_sampler is mutually exclusive with '
+                    'batch_size, shuffle, sampler, and drop_last'
+                )
 
         if sampler is not None and shuffle:
             raise ValueError('sampler is mutually exclusive with shuffle')

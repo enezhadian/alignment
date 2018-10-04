@@ -17,6 +17,7 @@ cython = "*"
 
 [dev-packages]
 ipython = "*"
+yapf = "*"
 
 [requires]
 python_version = "3.5"
