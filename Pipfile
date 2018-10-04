@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "*"
+pillow = "*"
+scikit-image = "*"
+scipy = "*"
+tqdm = "*"
+torch = "==0.4.0"
+torchvision = "==0.2.1"
+pandas = "*"
+nltk = "*"
+cython = "*"
+
+[dev-packages]
+ipython = "*"
+
+[requires]
+python_version = "3.5"
