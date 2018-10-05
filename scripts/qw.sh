@@ -10,6 +10,6 @@
         --training-dataset              pf-pascal            \
         --dataset-csv-path              data/pf-pascal-flip/ \
         --dataset-image-path            data/pfpascal        \
-        --num-epochs                    15                   \
+        --num-epochs                    30                   \
         --lr                            5e-8                 \
         --result-model-fn               delf_weak
