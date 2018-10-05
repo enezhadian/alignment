@@ -15,6 +15,7 @@ pandas = "*"
 nltk = "*"
 cython = "*"
 requests = "*"
+click = "*"
 
 [dev-packages]
 ipython = "*"
