@@ -14,6 +14,7 @@ torchvision = "==0.2.1"
 pandas = "*"
 nltk = "*"
 cython = "*"
+requests = "*"
 
 [dev-packages]
 ipython = "*"
