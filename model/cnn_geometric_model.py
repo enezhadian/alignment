@@ -8,6 +8,9 @@ import numpy.matlib
 from util.torch_util import Softmax1D
 from geotnf.transformation import GeometricTnf
 
+import os
+from model.delf import ResNetBase, DELF
+
 
 def featureL2Norm(feature):
     epsilon = 1e-6
@@ -26,7 +29,8 @@ class FeatureExtraction(torch.nn.Module):
         feature_extraction_cnn='vgg',
         normalization=True,
         last_layer='',
-        use_cuda=True
+        use_cuda=True,
+        delf_path=''
     ):
         super(FeatureExtraction, self).__init__()
         self.normalization = normalization
@@ -44,7 +48,7 @@ class FeatureExtraction(torch.nn.Module):
                 last_layer = 'pool4'
             last_layer_idx = vgg_feature_layers.index(last_layer)
             self.model = nn.Sequential(*list(self.model.features.children())[:last_layer_idx + 1])
-        if feature_extraction_cnn == 'resnet101':
+        elif feature_extraction_cnn == 'resnet101':
             self.model = models.resnet101(pretrained=True)
             resnet_feature_layers = [
                 'conv1', 'bn1', 'relu', 'maxpool', 'layer1', 'layer2', 'layer3', 'layer4'
@@ -58,16 +62,55 @@ class FeatureExtraction(torch.nn.Module):
             ]
 
             self.model = nn.Sequential(*resnet_module_list[:last_layer_idx + 1])
-        if feature_extraction_cnn == 'resnet101_v2':
+        elif feature_extraction_cnn == 'resnet101_v2':
             self.model = models.resnet101(pretrained=True)
             # keep feature extraction network up to pool4 (last layer - 7)
             self.model = nn.Sequential(*list(self.model.children())[:-3])
-        if feature_extraction_cnn == 'densenet201':
+        elif feature_extraction_cnn == 'densenet201':
             self.model = models.densenet201(pretrained=True)
             # keep feature extraction network up to denseblock3
             # self.model = nn.Sequential(*list(self.model.features.children())[:-3])
             # keep feature extraction network up to transitionlayer2
             self.model = nn.Sequential(*list(self.model.features.children())[:-4])
+        # elif feature_extraction_cnn == "resnet50":
+        #     targets = {
+        #         # for each allowed target layer keep the module index, input size of fc,
+        #         # and kernel size and stride for avgpool.
+        #         "layer1": 4,
+        #         "layer2": 5,
+        #         "layer3": 6,
+        #         "layer4": 7
+        #     }
+        #     if last_layer=='':
+        #         last_layer = 'layer3'
+        #     index = targets[last_layer]
+        #     resnet50 = models.resnet50(pretrained=True)
+        #     modules = list(resnet50.children())[:index+1]
+        #     self.model = nn.Sequential(*modules)
+        else:
+            if last_layer == '':
+                last_layer = 'layer3'
+             # <resnet_type>_<resnet_num_classes>_<full>_<delf_num_classes>
+            resnet_type = int(feature_extraction_cnn.split('_')[0])
+            resnet_num_classes = int(feature_extraction_cnn.split('_')[1])
+            full = feature_extraction_cnn.split('_')[2] == 'full'
+            delf_num_classes = int(feature_extraction_cnn.split('_')[3])
+            target_layer = int(last_layer[-1])
+            target_channels = {1: 256, 2: 512, 3: 1024, 4: 2048}[target_layer]
+            state_dict = th.load(delf_path)['Model']
+            base_model = ResNetBase(
+                resnet_type=resnet_type,
+                target_layer=target_layer,
+                num_classes=resnet_num_classes,
+                freeze=True, full=full
+            )
+            self.model = DELF(
+                base_model=base_model,
+                target_channels=target_channels,
+                num_classes=delf_num_classes
+            )
+            self.model.load_state_dict(state_dict)
+        # Other preparations
         if not train_fe:
             # freeze parameters
             for param in self.model.parameters():
@@ -175,7 +218,8 @@ class CNNGeometric(nn.Module):
         normalize_matches=True,
         batch_normalization=True,
         train_fe=False,
-        use_cuda=True
+        use_cuda=True,
+        delf_path=''
     ):
         #                 regressor_channels_1 = 128,
         #                 regressor_channels_2 = 64):
@@ -242,7 +286,8 @@ class TwoStageCNNGeometric(CNNGeometric):
         train_fe=False,
         use_cuda=True,
         s1_output_dim=6,
-        s2_output_dim=18
+        s2_output_dim=18,
+        delf_path=''
     ):
 
         super(TwoStageCNNGeometric, self).__init__(
