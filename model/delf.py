@@ -78,4 +78,4 @@ class DELF(nn.Module):
         interim = F.relu(self.bn1(interim))
         interim = self.conv2(interim)
         attention = F.softplus(interim)
-        return feature_maps, attention
+        return feature_maps*attention
