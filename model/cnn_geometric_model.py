@@ -15,8 +15,6 @@ from model.delf import ResNetBase, DELF
 
 def featureL2Norm(feature):
     epsilon = 1e-6
-    #        print(feature.size())
-    #        print(torch.pow(torch.sum(torch.pow(feature,2),1)+epsilon,0.5).size())
     norm = torch.pow(torch.sum(torch.pow(feature, 2), 1) + epsilon,
                      0.5).unsqueeze(1).expand_as(feature)
     return torch.div(feature, norm)
@@ -136,12 +134,7 @@ class FeatureCorrelation(torch.nn.Module):
         self.shape = shape
         self.ReLU = nn.ReLU()
 
-    def forward(self, feature_A, feature_B, cues_A, cues_B):
-        if cues_A is None or cues_B is None:
-            # localization cues are available
-            pass # TODO: create uniform localization weight over all the images.
-
-        # TODO: update this to use localization cues.
+    def forward(self, feature_A, feature_B):
         b, c, h, w = feature_A.size()
         if self.shape == '3D':
             # reshape features for matrix multiplication
@@ -223,9 +216,6 @@ class CNNGeometric(nn.Module):
         use_cuda=True,
         delf_path=''
     ):
-        #                 regressor_channels_1 = 128,
-        #                 regressor_channels_2 = 64):
-
         super(CNNGeometric, self).__init__()
         self.use_cuda = use_cuda
         self.feature_self_matching = feature_self_matching
@@ -259,11 +249,8 @@ class CNNGeometric(nn.Module):
         # feature extraction
         feature_A = self.FeatureExtraction(tnf_batch['source_image'])
         feature_B = self.FeatureExtraction(tnf_batch['target_image'])
-        # localization cues
-        cues_A = tnf_batch.get('source_cues')
-        cues_B = tnf_batch.get('target_cues')
         # feature correlation
-        correlation = self.FeatureCorrelation(feature_A, feature_B, cues_A, cues_B)
+        correlation = self.FeatureCorrelation(feature_A, feature_B)
         # regression to tnf parameters theta
         theta = self.FeatureRegression(correlation)
 

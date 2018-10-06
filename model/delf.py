@@ -74,5 +74,5 @@ class DELF(nn.Module):
         interim = F.relu(self.bn1(interim))
         interim = self.conv2(interim)
         attention = F.softplus(interim)
-        weight = (attention - attention.min())/(attention.max() - attention.min())
-        return weight*feature_maps
+        weight = (attention - attention.min()) / (attention.max() - attention.min())
+        return weight * feature_maps

@@ -264,12 +264,7 @@ class ArgumentParser():
             default='',
             help='feature extraction CNN last layer'
         )
-        model_params.add_argument(
-            '--delf-path',
-            type=str,
-            default='',
-            help='DELF checkpoint path'
-        )
+        model_params.add_argument('--delf-path', type=str, default='', help='DELF checkpoint path')
         model_params.add_argument(
             '--fr-feature-size', type=int, default=15, help='image input size'
         )
