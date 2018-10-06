@@ -14,7 +14,7 @@
         --result-model-fn               delf
 
     python3 -m train_strong                                                                     \
-        --model trained_models/best_delf_strong_50_pascal_tps_50_1000_full_20_grid_loss.pth.tar \
+        --model trained_models/best_delf_strong_30_pascal_tps_50_1000_full_20_grid_loss.pth.tar \
         --feature-extraction-cnn        50_1000_full_20                                         \
         --feature-extraction-last-layer layer3                                                  \
         --delf-path ../delf_ep10_bz32_lr0.001_im224_taken/20180927113241/best.pth.tar           \
