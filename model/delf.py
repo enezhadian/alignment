@@ -46,14 +46,10 @@ class ResNetBase(nn.Module):
 
     def forward(self, x):
         for name, module in self.named_children():
-            if name == 'fc':
-                x = x.view(x.size(0), -1)
             x = module(x)
-            # Keep activations of target layer.
             if name == self.target:
-                activations = x
-                activations.retain_grad()
-        return x, activations
+                break
+        return x
 
 
 class DELF(nn.Module):
@@ -72,7 +68,7 @@ class DELF(nn.Module):
 
     def forward(self, batch):
         # Calculate feature maps.
-        _, feature_maps = self.base_model(batch)
+        feature_maps = self.base_model(batch)
         # Calculate attention scores.
         interim = self.conv1(feature_maps)
         interim = F.relu(self.bn1(interim))

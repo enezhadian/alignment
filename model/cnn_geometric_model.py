@@ -103,7 +103,8 @@ class FeatureExtraction(torch.nn.Module):
                 resnet_type=resnet_type,
                 target_layer=target_layer,
                 num_classes=resnet_num_classes,
-                freeze=True, full=full
+                freeze=True,
+                full=full
             )
             self.model = DELF(
                 base_model=base_model,
