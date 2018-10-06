@@ -225,7 +225,7 @@ def process_epoch(
             optimizer.zero_grad()
         tnf_batch = batch_preprocessing_fn(batch)
         loss = loss_fn(tnf_batch)
-        loss_np = loss.data.cpu().numpy()[0]
+        loss_np = loss.data.cpu().numpy()
         epoch_loss += loss_np
         if mode == 'train':
             loss.backward()

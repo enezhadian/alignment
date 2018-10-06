@@ -22,7 +22,7 @@ def train_fun_strong(
         loss = loss_fn(theta, tnf_batch['theta_GT'])
         loss.backward()
         optimizer.step()
-        train_loss += loss.data.cpu().numpy()[0]
+        train_loss += loss.data.cpu().numpy()
         if batch_idx % log_interval == 0:
             print(
                 'Train Epoch: {} [{}/{} ({:.0f}%)]\t\tLoss: {:.6f}'.format(
@@ -42,7 +42,7 @@ def test_fun_strong(model, loss_fn, dataloader, pair_generation_tnf, use_cuda=Tr
         tnf_batch = pair_generation_tnf(batch)
         theta = model(tnf_batch)
         loss = loss_fn(theta, tnf_batch['theta_GT'])
-        test_loss += loss.data.cpu().numpy()[0]
+        test_loss += loss.data.cpu().numpy()
 
     test_loss /= len(dataloader)
     print('Test set: Average loss: {:.4f}'.format(test_loss))
@@ -96,7 +96,7 @@ def train_fun_weak(
 
         loss.backward()
         optimizer.step()
-        train_loss += loss.data.cpu().numpy()[0]
+        train_loss += loss.data.cpu().numpy()
         print_train_progress(log_interval, batch_idx, len(dataloader), epoch, loss.data[0])
     train_loss /= len(dataloader)
     print('Train set: Average loss: {:.4f}'.format(train_loss))
@@ -134,7 +134,7 @@ def test_fun_weak(
             inliers_pos = loss_fn(theta_pos, corr_pos)
             inliers_neg = loss_fn(theta_neg, corr_neg)
             loss = torch.sum(inliers_neg - inliers_pos)
-        test_loss += loss.data.cpu().numpy()[0]
+        test_loss += loss.data.cpu().numpy()
 
     test_loss /= len(dataloader)
     print('Test set: Average loss: {:.4f}'.format(test_loss))
