@@ -9,6 +9,7 @@ from util.torch_util import Softmax1D
 from geotnf.transformation import GeometricTnf
 
 import os
+import torch as th
 from model.delf import ResNetBase, DELF
 
 
@@ -235,7 +236,8 @@ class CNNGeometric(nn.Module):
             feature_extraction_cnn=feature_extraction_cnn,
             last_layer=feature_extraction_last_layer,
             normalization=normalize_features,
-            use_cuda=self.use_cuda
+            use_cuda=self.use_cuda,
+            delf_path=delf_path
         )
 
         self.FeatureCorrelation = FeatureCorrelation(shape='3D', normalization=normalize_matches)
@@ -302,7 +304,8 @@ class TwoStageCNNGeometric(CNNGeometric):
             normalize_matches=normalize_matches,
             batch_normalization=batch_normalization,
             train_fe=train_fe,
-            use_cuda=use_cuda
+            use_cuda=use_cuda,
+            delf_path=delf_path
         )
 
         if s1_output_dim == 6:
