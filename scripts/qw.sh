@@ -9,7 +9,7 @@
         --delf-path ../delf_ep10_bz32_lr0.001_im224_taken/20180927113241/best.pth.tar                            \
         --training-dataset              pf-pascal                                                                \
         --dataset-csv-path              training_data/pf-pascal-flip/                                            \
-        --dataset-image-path            datasets/proposal-flow-willow                                            \
+        --dataset-image-path            datasets/proposal-flow-pascal                                            \
         --num-epochs                    30                                                                       \
         --lr                            5e-8                                                                     \
         --result-model-fn               delf_weak
