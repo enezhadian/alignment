@@ -20,6 +20,7 @@ click = "*"
 [dev-packages]
 ipython = "*"
 yapf = "*"
+jupyterlab = "*"
 
 [requires]
 python_version = "3.5"
