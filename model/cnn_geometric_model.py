@@ -11,6 +11,7 @@ from geotnf.transformation import GeometricTnf
 import os
 import torch as th
 from model.delf import ResNetBase, DELF
+from model.mask_classify import SegmentTrainer, Segment
 
 
 def featureL2Norm(feature):
@@ -71,21 +72,35 @@ class FeatureExtraction(torch.nn.Module):
             # self.model = nn.Sequential(*list(self.model.features.children())[:-3])
             # keep feature extraction network up to transitionlayer2
             self.model = nn.Sequential(*list(self.model.features.children())[:-4])
-        # elif feature_extraction_cnn == "resnet50":
-        #     targets = {
-        #         # for each allowed target layer keep the module index, input size of fc,
-        #         # and kernel size and stride for avgpool.
-        #         "layer1": 4,
-        #         "layer2": 5,
-        #         "layer3": 6,
-        #         "layer4": 7
-        #     }
-        #     if last_layer=='':
-        #         last_layer = 'layer3'
-        #     index = targets[last_layer]
-        #     resnet50 = models.resnet50(pretrained=True)
-        #     modules = list(resnet50.children())[:index+1]
-        #     self.model = nn.Sequential(*modules)
+        elif feature_extraction_cnn == "resnet50":
+            targets = {
+                # for each allowed target layer keep the module index, input size of fc,
+                # and kernel size and stride for avgpool.
+                "layer1": 4,
+                "layer2": 5,
+                "layer3": 6,
+                "layer4": 7
+            }
+            if last_layer=='':
+                last_layer = 'layer3'
+            index = targets[last_layer]
+            resnet50 = models.resnet50(pretrained=True)
+            modules = list(resnet50.children())[:index+1]
+            self.model = nn.Sequential(*modules)
+        elif feature_extraction_cnn in ["mask_classify50", "mask_classify101"]: # Load a segment pth.tar file.
+            if not last_layer:
+                last_layer = "layer3"
+            segment_trainer = SegmentTrainer(
+                model="resnet" + feature_extraction_cnn[7:],
+                target_layer=last_layer
+            )
+            state_dict = th.load(str(models_path("new_{}{}.pth.tar".format(
+                feature_extraction_cnn, last_layer))
+            ))
+            while list(state_dict.keys())[-1].startswith("upsample"):
+                state_dict.popitem(last=True)
+            segment_trainer.load_state_dict(state_dict)
+            self.model = Segment(segment_trainer)
         else:
             if last_layer == '':
                 last_layer = 'layer3'
