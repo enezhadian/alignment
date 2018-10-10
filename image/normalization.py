@@ -5,13 +5,13 @@ from torch.autograd import Variable
 
 class NormalizeImageDict(object):
     """
-    
+
     Normalizes Tensor images in dictionary
-    
+
     Args:
         image_keys (list): dict. keys of the images to be normalized
         normalizeRange (bool): if True the image is divided by 255.0s
-    
+
     """
 
     def __init__(self, image_keys, normalizeRange=True):
@@ -34,7 +34,7 @@ def normalize_image(image, forward=True, mean=[0.485, 0.456, 0.406], std=[0.229,
     if image.is_cuda:
         mean = mean.cuda()
         std = std.cuda()
-    if isinstance(image, torch.autograd.variable.Variable):
+    if isinstance(image, Variable):
         mean = Variable(mean, requires_grad=False)
         std = Variable(std, requires_grad=False)
     if forward:
