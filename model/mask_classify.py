@@ -94,7 +94,7 @@ class Segment(nn.Module):
         self.upsample = Upsample(size=(224, 224), mode="bilinear", align_corners=False)
 
 
-    def forward(self, inp, ret_masked=True):
+    def forward(self, inp, ret_all=False):
         # Save a copy of feature maps.
         feature_maps = self.resnet_convs(inp)
 
@@ -104,10 +104,13 @@ class Segment(nn.Module):
         attention = self.conv2(attention)
         attention = F.softplus(attention)
 
-        min_val = attention.min()
-        max_val = attention.max()
-        mask = (attention - min_val) / (max_val - min_val)
-        mask[mask < 0.5] = 0.
+        # min_val = attention.min()
+        # max_val = attention.max()
+        # mask = (attention - min_val) / (max_val - min_val)
+        # mask[mask < 0.5] = 0.
+        mask = F.sigmoid(100 * (attention - 0.85))
 
         masked_fmaps = mask * feature_maps
+        if ret_all:
+            return attention, mask, feature_maps, masked_fmaps
         return masked_fmaps

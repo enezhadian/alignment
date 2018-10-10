@@ -91,12 +91,10 @@ class FeatureExtraction(torch.nn.Module):
             if not last_layer:
                 last_layer = "layer3"
             segment_trainer = SegmentTrainer(
-                model="resnet" + feature_extraction_cnn[7:],
+                model="resnet" + feature_extraction_cnn[13:],
                 target_layer=last_layer
             )
-            state_dict = th.load(str(models_path("new_{}{}.pth.tar".format(
-                feature_extraction_cnn, last_layer))
-            ))
+            state_dict = th.load(delf_path)
             while list(state_dict.keys())[-1].startswith("upsample"):
                 state_dict.popitem(last=True)
             segment_trainer.load_state_dict(state_dict)

@@ -10,9 +10,13 @@
 #       --feature-extraction-cnn resnet101                                                                          \
 #       --model                  ../selected_models/weak_resnet101/resnet101_weak_resnet101_regfact0.2.pth.tar      \
 #       --eval-dataset           pf-pascal
-    python eval.py                                                                                                \
-      --feature-extraction-cnn 101_1000_full_1000                                                                 \
-      --model                  ../final_evaluations/best_delf_dist101_weak_101_1000_full_1000_regfact0.2.pth.tar  \
-      --delf-path              ../selected_models/delf_dist101_converted.pth.tar                                  \
+#     python eval.py                                                                                                \
+#       --feature-extraction-cnn 101_1000_full_1000                                                                 \
+#       --model                  ../final_evaluations/best_delf_dist101_weak_101_1000_full_1000_regfact0.2.pth.tar  \
+#       --delf-path              ../selected_models/delf_dist101_converted.pth.tar                                  \
+#       --eval-dataset           pf-pascal
+    python eval.py                                                                                              \
+      --feature-extraction-cnn mask_classify50                                                                  \
+      --model                  "../final_evaluations/best_segment50layer3_weak_segment50_regfact0.2.pth.tar"    \
+      --delf-path              "../selected_models/mask_classify/segment50layer3.pth.tar"                       \
       --eval-dataset           pf-pascal
-
